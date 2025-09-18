@@ -28,6 +28,8 @@ const emit = defineEmits(["close", "save-success"]);
 
 // S3配置列表
 const s3Configs = ref([]);
+// WebDAV配置列表
+const webdavConfigs = ref([]);
 // 表单数据
 const formData = ref({
   name: "",
@@ -67,7 +69,7 @@ const formTitle = computed(() => {
 // 存储类型选项
 const storageTypeOptions = computed(() => [
   { value: "S3", label: t("admin.mount.form.storageTypes.s3") },
-  // { value: "WebDAV", label: "WebDAV" },
+  { value: "webdav", label: t("admin.mount.form.storageTypes.webdav") },
   // { value: "FTP", label: "FTP" },
   // { value: "SMB", label: "SMB/CIFS" },
 ]);
@@ -112,6 +114,8 @@ const validateField = (fieldName) => {
     case "storage_config_id":
       if (formData.value.storage_type === "S3" && !formData.value.storage_config_id) {
         newErrors.storage_config_id = t("admin.mount.validation.s3ConfigRequired");
+      } else if (formData.value.storage_type === "webdav" && !formData.value.storage_config_id) {
+        newErrors.storage_config_id = t("admin.mount.validation.webdavConfigRequired");
       } else {
         delete newErrors.storage_config_id;
       }
@@ -292,6 +296,24 @@ const loadS3Configs = async () => {
   }
 };
 
+// 加载WebDAV配置列表
+const loadWebDAVConfigs = async () => {
+  loading.value = true;
+
+  try {
+    const response = await api.storage.getAllWebDAVConfigs();
+    if (response.code === 200 && response.data) {
+      webdavConfigs.value = response.data;
+    } else {
+      console.error("加载WebDAV配置失败:", response.message);
+    }
+  } catch (err) {
+    console.error("加载WebDAV配置错误:", err);
+  } finally {
+    loading.value = false;
+  }
+};
+
 // 关闭表单
 const closeForm = () => {
   emit("close");
@@ -299,8 +321,8 @@ const closeForm = () => {
 
 // 组件挂载时初始化数据
 onMounted(async () => {
-  // 加载S3配置
-  await loadS3Configs();
+  // 加载S3配置和WebDAV配置
+  await Promise.all([loadS3Configs(), loadWebDAVConfigs()]);
 
   // 如果是编辑模式，复制现有数据到表单
   if (isEditMode.value) {
@@ -458,6 +480,27 @@ const resetFormData = () => {
             </select>
             <p v-if="errors.storage_config_id" class="mt-1 text-sm text-red-500">{{ errors.storage_config_id }}</p>
             <p v-if="s3Configs.length === 0 && !loading" class="mt-1 text-xs" :class="darkMode ? 'text-gray-400' : 'text-gray-500'">{{ t("admin.mount.form.noS3Config") }}</p>
+          </div>
+
+          <!-- WebDAV配置选择（仅当存储类型为WebDAV时显示） -->
+          <div v-if="formData.storage_type === 'WebDAV'">
+            <label for="storage_config_id" class="block text-sm font-medium mb-1" :class="darkMode ? 'text-gray-200' : 'text-gray-700'">
+              {{ t("admin.mount.form.webdavConfig") }} <span class="text-red-500">*</span>
+            </label>
+            <select
+              id="storage_config_id"
+              v-model="formData.storage_config_id"
+              @change="handleFieldChange('storage_config_id')"
+              @blur="validateField('storage_config_id')"
+              class="block w-full px-3 py-1.5 sm:py-2 rounded-md text-sm transition-colors duration-200"
+              :class="[darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300 text-gray-900', errors.storage_config_id ? 'border-red-500' : '']"
+              :disabled="loading"
+            >
+              <option value="">{{ t("admin.mount.form.selectWebDAVConfig") }}</option>
+              <option v-for="config in webdavConfigs" :key="config.id" :value="config.id">{{ config.name }} ({{ config.server_url }})</option>
+            </select>
+            <p v-if="errors.storage_config_id" class="mt-1 text-sm text-red-500">{{ errors.storage_config_id }}</p>
+            <p v-if="webdavConfigs.length === 0 && !loading" class="mt-1 text-xs" :class="darkMode ? 'text-gray-400' : 'text-gray-500'">{{ t("admin.mount.form.noWebDAVConfig") }}</p>
           </div>
 
           <!-- 挂载路径 -->

@@ -142,6 +142,32 @@ async function createStorageTables(db) {
     )
     .run();
 
+  // 创建webdav_configs表 - 存储WebDAV配置信息
+  await db
+    .prepare(
+      `
+      CREATE TABLE IF NOT EXISTS ${DbTables.WEBDAV_CONFIGS} (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        server_url TEXT NOT NULL,
+        username TEXT NOT NULL,
+        password TEXT NOT NULL,
+        default_folder TEXT DEFAULT '',
+        is_public BOOLEAN DEFAULT 0,
+        is_default BOOLEAN DEFAULT 0,
+        total_storage_bytes BIGINT,
+        connection_timeout INTEGER DEFAULT 30,
+        read_timeout INTEGER DEFAULT 60,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        last_used DATETIME,
+        admin_id TEXT,
+        FOREIGN KEY (admin_id) REFERENCES ${DbTables.ADMINS}(id) ON DELETE CASCADE
+      )
+    `
+    )
+    .run();
+
   // 创建storage_mounts表 - 存储挂载配置
   await db
     .prepare(
@@ -555,6 +581,36 @@ async function executeMigrationForVersion(db, version) {
     case 17:
       // 版本17：添加自定义头部和body设置
       await addCustomContentSettings(db);
+      break;
+
+    case 18:
+      // 版本18：创建WebDAV配置表
+      console.log("创建WebDAV配置表...");
+      await db
+        .prepare(
+          `
+          CREATE TABLE IF NOT EXISTS ${DbTables.WEBDAV_CONFIGS} (
+            id TEXT PRIMARY KEY,
+            name TEXT NOT NULL,
+            server_url TEXT NOT NULL,
+            username TEXT NOT NULL,
+            password TEXT NOT NULL,
+            default_folder TEXT DEFAULT '',
+            is_public BOOLEAN DEFAULT 0,
+            is_default BOOLEAN DEFAULT 0,
+            total_storage_bytes BIGINT,
+            connection_timeout INTEGER DEFAULT 30,
+            read_timeout INTEGER DEFAULT 60,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            last_used DATETIME,
+            admin_id TEXT,
+            FOREIGN KEY (admin_id) REFERENCES ${DbTables.ADMINS}(id) ON DELETE CASCADE
+          )
+        `
+        )
+        .run();
+      console.log("WebDAV配置表创建完成");
       break;
 
     default:
@@ -1164,6 +1220,7 @@ export async function checkAndInitDatabase(db) {
       DbTables.ADMIN_TOKENS,
       DbTables.API_KEYS,
       DbTables.S3_CONFIGS,
+      DbTables.WEBDAV_CONFIGS,
       DbTables.FILES,
       DbTables.FILE_PASSWORDS,
       DbTables.SYSTEM_SETTINGS,
@@ -1188,7 +1245,7 @@ export async function checkAndInitDatabase(db) {
     const versionSetting = await db.prepare(`SELECT value FROM ${DbTables.SYSTEM_SETTINGS} WHERE key = 'schema_version'`).first();
 
     const currentVersion = versionSetting ? parseInt(versionSetting.value) : 0;
-    const targetVersion = 17; // 当前最新版本
+    const targetVersion = 18; // 当前最新版本
 
     if (currentVersion < targetVersion) {
       console.log(`需要更新数据库结构，当前版本:${currentVersion}，目标版本:${targetVersion}`);

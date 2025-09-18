@@ -5,6 +5,7 @@
 -- 删除已有表（如果需要重新创建）
 DROP TABLE IF EXISTS files;
 DROP TABLE IF EXISTS s3_configs;
+DROP TABLE IF EXISTS webdav_configs;
 DROP TABLE IF EXISTS api_keys;
 DROP TABLE IF EXISTS admin_tokens;
 DROP TABLE IF EXISTS admins;
@@ -87,6 +88,26 @@ CREATE TABLE s3_configs (
   admin_id TEXT,                       -- 关联的管理员ID
   custom_host TEXT,                    -- 自定义域名/CDN域名
   signature_expires_in INTEGER DEFAULT 3600, -- 签名有效期（秒）
+  FOREIGN KEY (admin_id) REFERENCES admins(id) ON DELETE CASCADE
+);
+
+-- 创建webdav_configs表 - 存储WebDAV配置信息
+CREATE TABLE webdav_configs (
+  id TEXT PRIMARY KEY,                 -- 配置唯一标识
+  name TEXT NOT NULL,                  -- 配置名称（用户友好的名称，如"我的WebDAV服务器"）
+  server_url TEXT NOT NULL,            -- WebDAV服务器URL
+  username TEXT NOT NULL,              -- 用户名（加密存储）
+  password TEXT NOT NULL,              -- 密码（加密存储）
+  default_folder TEXT DEFAULT '',      -- 默认上传文件夹路径
+  is_public BOOLEAN DEFAULT 0,         -- 是否为公开允许API密钥用户使用
+  is_default BOOLEAN DEFAULT 0,        -- 是否为默认配置
+  total_storage_bytes BIGINT,          -- 存储总容量（字节数），用于计算使用百分比，NULL表示使用默认值
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  last_used DATETIME,                  -- 最后使用时间
+  admin_id TEXT,                       -- 关联的管理员ID
+  connection_timeout INTEGER DEFAULT 30, -- 连接超时时间（秒）
+  read_timeout INTEGER DEFAULT 60,    -- 读取超时时间（秒）
   FOREIGN KEY (admin_id) REFERENCES admins(id) ON DELETE CASCADE
 );
 

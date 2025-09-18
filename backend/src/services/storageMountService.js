@@ -4,7 +4,7 @@
 import { ApiStatus } from "../constants/index.js";
 import { HTTPException } from "hono/http-exception";
 import { generateUUID } from "../utils/common.js";
-import { MountRepository, S3ConfigRepository } from "../repositories/index.js";
+import { MountRepository, S3ConfigRepository, WebDAVConfigRepository } from "../repositories/index.js";
 
 /**
  * 挂载点服务类
@@ -18,6 +18,7 @@ class MountService {
   constructor(db) {
     this.mountRepository = new MountRepository(db);
     this.s3ConfigRepository = new S3ConfigRepository(db);
+    this.webdavConfigRepository = new WebDAVConfigRepository(db);
   }
 
   /**

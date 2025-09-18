@@ -7,6 +7,7 @@ import apiKeyRoutes from "./routes/apiKeyRoutes.js";
 import { backupRoutes } from "./routes/backupRoutes.js";
 
 import s3ConfigRoutes from "./routes/s3ConfigRoutes.js";
+import webdavConfigRoutes from "./routes/webdavConfigRoutes.js";
 import systemRoutes from "./routes/systemRoutes.js";
 import mountRoutes from "./routes/mountRoutes.js";
 import webdavRoutes from "./routes/webdavRoutes.js";
@@ -100,6 +101,7 @@ app.route("/", pastesRoutes);
 app.route("/", s3UploadRoutes);
 app.route("/", urlUploadRoutes);
 app.route("/", s3ConfigRoutes);
+app.route("/", webdavConfigRoutes);
 app.route("/", systemRoutes);
 app.route("/", mountRoutes);
 app.route("/", webdavRoutes);

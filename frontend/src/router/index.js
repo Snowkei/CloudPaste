@@ -135,6 +135,15 @@ const routes = [
         },
       },
       {
+        path: "webdav-config",
+        name: "AdminWebDAVConfig",
+        component: createOfflineAwareImport(() => import("../views/admin/WebDAVConfigView.vue"), "WebDAV配置"),
+        meta: {
+          title: "WebDAV存储配置 - CloudPaste",
+          adminOnly: true, // 只有管理员可访问
+        },
+      },
+      {
         path: "account",
         name: "AdminAccountManagement",
         component: createOfflineAwareImport(() => import("../views/admin/AccountManagementView.vue"), "账号管理"),
@@ -542,6 +551,9 @@ router.afterEach(async (to, from) => {
         break;
       case "AdminStorageConfig":
         title = `${t("pageTitle.adminModules.storageConfig")} - ${siteTitle}`;
+        break;
+      case "AdminWebDAVConfig":
+        title = `${t("pageTitle.adminModules.webdavConfig")} - ${siteTitle}`;
         break;
       case "AdminMountManagement":
         title = `${t("pageTitle.adminModules.mountManagement")} - ${siteTitle}`;

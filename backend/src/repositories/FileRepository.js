@@ -41,6 +41,7 @@ export class FileRepository extends BaseRepository {
         f.*,
         CASE
           WHEN f.storage_type = 'S3' THEN s.endpoint_url
+          WHEN f.storage_type = 'WebDAV' THEN w.url
           ELSE NULL
         END as endpoint_url,
         CASE
@@ -53,10 +54,12 @@ export class FileRepository extends BaseRepository {
         END as region,
         CASE
           WHEN f.storage_type = 'S3' THEN s.access_key_id
+          WHEN f.storage_type = 'WebDAV' THEN w.username
           ELSE NULL
         END as access_key_id,
         CASE
           WHEN f.storage_type = 'S3' THEN s.secret_access_key
+          WHEN f.storage_type = 'WebDAV' THEN w.password
           ELSE NULL
         END as secret_access_key,
         CASE
@@ -65,14 +68,17 @@ export class FileRepository extends BaseRepository {
         END as path_style,
         CASE
           WHEN f.storage_type = 'S3' THEN s.provider_type
+          WHEN f.storage_type = 'WebDAV' THEN 'WebDAV'
           ELSE NULL
         END as storage_provider_type,
         CASE
           WHEN f.storage_type = 'S3' THEN s.name
+          WHEN f.storage_type = 'WebDAV' THEN w.name
           ELSE NULL
         END as storage_config_name
       FROM ${DbTables.FILES} f
       LEFT JOIN ${DbTables.S3_CONFIGS} s ON f.storage_type = 'S3' AND f.storage_config_id = s.id
+      LEFT JOIN ${DbTables.WEBDAV_CONFIGS} w ON f.storage_type = 'WebDAV' AND f.storage_config_id = w.id
       WHERE f.slug = ?
       `,
       [slug]
@@ -105,10 +111,12 @@ export class FileRepository extends BaseRepository {
         END as region,
         CASE
           WHEN f.storage_type = 'S3' THEN s.access_key_id
+          WHEN f.storage_type = 'WebDAV' THEN w.username
           ELSE NULL
         END as access_key_id,
         CASE
           WHEN f.storage_type = 'S3' THEN s.secret_access_key
+          WHEN f.storage_type = 'WebDAV' THEN w.password
           ELSE NULL
         END as secret_access_key,
         CASE
@@ -117,14 +125,17 @@ export class FileRepository extends BaseRepository {
         END as path_style,
         CASE
           WHEN f.storage_type = 'S3' THEN s.provider_type
+          WHEN f.storage_type = 'WebDAV' THEN 'WebDAV'
           ELSE NULL
         END as storage_provider_type,
         CASE
           WHEN f.storage_type = 'S3' THEN s.name
+          WHEN f.storage_type = 'WebDAV' THEN w.name
           ELSE NULL
         END as storage_config_name
       FROM ${DbTables.FILES} f
       LEFT JOIN ${DbTables.S3_CONFIGS} s ON f.storage_type = 'S3' AND f.storage_config_id = s.id
+      LEFT JOIN ${DbTables.WEBDAV_CONFIGS} w ON f.storage_type = 'WebDAV' AND f.storage_config_id = w.id
       WHERE f.id = ?
       `,
       [fileId]
@@ -398,19 +409,23 @@ export class FileRepository extends BaseRepository {
         f.password, f.created_by, f.use_proxy,
         CASE
           WHEN f.storage_type = 'S3' THEN s.name
+          WHEN f.storage_type = 'WebDAV' THEN w.name
           ELSE NULL
         END as storage_config_name,
         CASE
           WHEN f.storage_type = 'S3' THEN s.provider_type
+          WHEN f.storage_type = 'WebDAV' THEN 'WebDAV'
           ELSE NULL
         END as storage_provider_type,
         CASE
           WHEN f.storage_type = 'S3' THEN s.id
+          WHEN f.storage_type = 'WebDAV' THEN w.id
           ELSE NULL
         END as storage_config_detail_id,
         ak.name as key_name
       FROM ${DbTables.FILES} f
       LEFT JOIN ${DbTables.S3_CONFIGS} s ON f.storage_type = 'S3' AND f.storage_config_id = s.id
+      LEFT JOIN ${DbTables.WEBDAV_CONFIGS} w ON f.storage_type = 'WebDAV' AND f.storage_config_id = w.id
       LEFT JOIN ${DbTables.API_KEYS} ak ON f.created_by LIKE 'apikey:%' AND ak.id = SUBSTR(f.created_by, 8)
     `;
 
@@ -553,19 +568,23 @@ export class FileRepository extends BaseRepository {
         f.password, f.created_by, f.use_proxy,
         CASE
           WHEN f.storage_type = 'S3' THEN s.name
+          WHEN f.storage_type = 'WebDAV' THEN w.name
           ELSE NULL
         END as storage_config_name,
         CASE
           WHEN f.storage_type = 'S3' THEN s.provider_type
+          WHEN f.storage_type = 'WebDAV' THEN 'WebDAV'
           ELSE NULL
         END as storage_provider_type,
         CASE
           WHEN f.storage_type = 'S3' THEN s.id
+          WHEN f.storage_type = 'WebDAV' THEN w.id
           ELSE NULL
         END as storage_config_detail_id,
         ak.name as key_name
       FROM ${DbTables.FILES} f
       LEFT JOIN ${DbTables.S3_CONFIGS} s ON f.storage_type = 'S3' AND f.storage_config_id = s.id
+      LEFT JOIN ${DbTables.WEBDAV_CONFIGS} w ON f.storage_type = 'WebDAV' AND f.storage_config_id = w.id
       LEFT JOIN ${DbTables.API_KEYS} ak ON f.created_by LIKE 'apikey:%' AND ak.id = SUBSTR(f.created_by, 8)
       WHERE ${whereClause}
       ORDER BY f.created_at DESC

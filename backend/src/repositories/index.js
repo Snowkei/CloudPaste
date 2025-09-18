@@ -7,6 +7,7 @@ export { BaseRepository } from "./BaseRepository.js";
 export { FileRepository } from "./FileRepository.js";
 export { MountRepository } from "./MountRepository.js";
 export { S3ConfigRepository } from "./S3ConfigRepository.js";
+export { WebDAVConfigRepository } from "./WebDAVConfigRepository.js";
 export { AdminRepository } from "./AdminRepository.js";
 export { ApiKeyRepository } from "./ApiKeyRepository.js";
 export { PasteRepository } from "./PasteRepository.js";
@@ -17,6 +18,7 @@ import { BaseRepository } from "./BaseRepository.js";
 import { FileRepository } from "./FileRepository.js";
 import { MountRepository } from "./MountRepository.js";
 import { S3ConfigRepository } from "./S3ConfigRepository.js";
+import { WebDAVConfigRepository } from "./WebDAVConfigRepository.js";
 import { AdminRepository } from "./AdminRepository.js";
 import { ApiKeyRepository } from "./ApiKeyRepository.js";
 import { PasteRepository } from "./PasteRepository.js";
@@ -67,6 +69,17 @@ export class RepositoryFactory {
       this._repositories.set("s3config", new S3ConfigRepository(this.db));
     }
     return this._repositories.get("s3config");
+  }
+
+  /**
+   * 获取WebDAVConfigRepository实例
+   * @returns {WebDAVConfigRepository} WebDAVConfigRepository实例
+   */
+  getWebDAVConfigRepository() {
+    if (!this._repositories.has("webdavconfig")) {
+      this._repositories.set("webdavconfig", new WebDAVConfigRepository(this.db));
+    }
+    return this._repositories.get("webdavconfig");
   }
 
   /**
@@ -129,6 +142,7 @@ export class RepositoryFactory {
       file: this.getFileRepository(),
       mount: this.getMountRepository(),
       s3Config: this.getS3ConfigRepository(),
+      webdavConfig: this.getWebDAVConfigRepository(),
       admin: this.getAdminRepository(),
       apiKey: this.getApiKeyRepository(),
       paste: this.getPasteRepository(),

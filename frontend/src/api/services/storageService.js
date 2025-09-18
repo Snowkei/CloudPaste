@@ -95,5 +95,94 @@ export function testS3Config(id) {
   return post(`/s3-configs/${id}/test`);
 }
 
+/******************************************************************************
+ * WebDAV存储配置管理API
+ ******************************************************************************/
+
+/**
+ * 获取所有WebDAV存储配置（支持分页）
+ * @param {Object} params - 查询参数
+ * @param {number} [params.page] - 页码
+ * @param {number} [params.limit] - 每页数量
+ * @returns {Promise<Object>} WebDAV配置列表和分页信息
+ */
+export function getAllWebDAVConfigs(params = {}) {
+  const queryParams = new URLSearchParams();
+
+  if (params.page) {
+    queryParams.append("page", params.page.toString());
+  }
+  if (params.limit) {
+    queryParams.append("limit", params.limit.toString());
+  }
+
+  const queryString = queryParams.toString();
+  return get(`/webdav-configs${queryString ? `?${queryString}` : ""}`);
+}
+
+/**
+ * 获取单个WebDAV存储配置详情
+ * @param {string} id - 配置ID
+ * @returns {Promise<Object>} WebDAV配置详情
+ */
+export function getWebDAVConfig(id) {
+  return get(`/webdav-configs/${id}`);
+}
+
+/**
+ * 创建WebDAV存储配置
+ * @param {Object} config - WebDAV配置信息
+ * @param {string} config.name - 配置名称
+ * @param {string} config.server_url - WebDAV服务器URL
+ * @param {string} config.username - 用户名
+ * @param {string} config.password - 密码
+ * @param {string} [config.default_folder] - 默认上传文件夹路径
+ * @param {boolean} [config.is_public] - 是否允许API密钥访问（默认为false）
+ * @param {number} [config.connection_timeout] - 连接超时时间（秒）
+ * @param {number} [config.read_timeout] - 读取超时时间（秒）
+ * @returns {Promise<Object>} 创建结果
+ */
+export function createWebDAVConfig(config) {
+  return post("/webdav-configs", config);
+}
+
+/**
+ * 更新WebDAV存储配置
+ * @param {string} id - 配置ID
+ * @param {Object} config - 要更新的配置信息
+ * @returns {Promise<Object>} 更新结果
+ */
+export function updateWebDAVConfig(id, config) {
+  return put(`/webdav-configs/${id}`, config);
+}
+
+/**
+ * 删除WebDAV存储配置
+ * @param {string} id - 要删除的配置ID
+ * @returns {Promise<Object>} 删除结果
+ */
+export function deleteWebDAVConfig(id) {
+  return del(`/webdav-configs/${id}`);
+}
+
+/**
+ * 设置默认WebDAV存储配置
+ * @param {string} id - 要设置为默认的配置ID
+ * @returns {Promise<Object>} 设置结果
+ */
+export function setDefaultWebDAVConfig(id) {
+  return put(`/webdav-configs/${id}/set-default`);
+}
+
+/**
+ * 测试WebDAV存储配置连接
+ * @param {string} id - 配置ID
+ * @returns {Promise<Object>} 测试结果
+ */
+export function testWebDAVConfig(id) {
+  return post(`/webdav-configs/${id}/test`);
+}
+
 // 兼容性导出 - 保持向后兼容
 export const getS3Configs = getAllS3Configs;
+export const getWebDAVConfigs = getAllWebDAVConfigs;

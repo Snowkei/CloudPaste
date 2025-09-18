@@ -611,6 +611,7 @@ const visibleMenuItems = computed(() => {
       { id: "text-management", name: t("admin.sidebar.textManagement"), icon: "document-text", type: "item", routeName: "AdminTextManagement" },
       { id: "file-management", name: t("admin.sidebar.fileManagement"), icon: "folder", type: "item", routeName: "AdminFileManagement" },
       { id: "storage-config", name: t("admin.sidebar.storageConfig"), icon: "cloud", type: "item", routeName: "AdminStorageConfig" },
+      { id: "webdav-config", name: t("admin.sidebar.webdavConfig"), icon: "folder", type: "item", routeName: "AdminWebDAVConfig" },
       { id: "mount-management", name: t("admin.sidebar.mountManagement"), icon: "server", type: "item", routeName: "AdminMountManagement" },
       { id: "key-management", name: t("admin.sidebar.keyManagement"), icon: "key", type: "item", routeName: "AdminKeyManagement" },
       { id: "account-management", name: t("admin.sidebar.accountManagement"), icon: "user", type: "item", routeName: "AdminAccountManagement" },

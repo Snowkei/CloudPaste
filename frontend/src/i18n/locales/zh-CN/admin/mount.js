@@ -64,8 +64,12 @@ export default {
       s3Config: "S3存储配置",
       selectS3Config: "请选择S3存储配置",
       noS3Config: "暂无可用的S3存储配置",
+      webdavConfig: "WebDAV存储配置",
+      selectWebDAVConfig: "请选择WebDAV存储配置",
+      noWebDAVConfig: "暂无可用的WebDAV存储配置",
       storageTypes: {
         s3: "S3存储",
+        webdav: "WebDAV存储",
       },
       webdavPolicyOptions: {
         "302_redirect": "302重定向",
@@ -125,6 +129,7 @@ export default {
       nameLength: "挂载点名称长度必须在1-50个字符之间",
       storageTypeRequired: "请选择存储类型",
       s3ConfigRequired: "请选择S3配置",
+      webdavConfigRequired: "请选择WebDAV配置",
       mountPathRequired: "挂载路径不能为空",
       mountPathFormat: "挂载路径必须以/开头",
       mountPathInvalid: "挂载路径格式不正确，必须是/xxx格式，只能包含字母、数字、下划线、连字符、中文和斜杠",

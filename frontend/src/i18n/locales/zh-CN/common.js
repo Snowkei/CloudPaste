@@ -73,6 +73,7 @@ export default {
       textManagement: "文本管理",
       fileManagement: "文件管理",
       storageConfig: "S3存储配置",
+      webdavConfig: "WebDAV存储配置",
       mountManagement: "挂载管理",
       keyManagement: "密钥管理",
       settings: "系统设置",

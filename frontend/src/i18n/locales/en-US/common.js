@@ -70,6 +70,7 @@ export default {
       textManagement: "Text Management",
       fileManagement: "File Management",
       storageConfig: "S3 Storage Config",
+      webdavConfig: "WebDAV Storage Config",
       mountManagement: "Mount Management",
       keyManagement: "Key Management",
       settings: "System Settings",

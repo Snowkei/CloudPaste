@@ -64,8 +64,12 @@ export default {
       s3Config: "S3 Storage Configuration",
       selectS3Config: "Please select S3 storage configuration",
       noS3Config: "No S3 storage configurations available",
+      webdavConfig: "WebDAV Storage Configuration",
+      selectWebDAVConfig: "Please select WebDAV storage configuration",
+      noWebDAVConfig: "No WebDAV storage configurations available",
       storageTypes: {
         s3: "S3 Storage",
+        webdav: "WebDAV Storage",
       },
       webdavPolicyOptions: {
         "302_redirect": "302 Redirect",
@@ -125,6 +129,7 @@ export default {
       nameLength: "Mount point name must be between 1-50 characters",
       storageTypeRequired: "Please select a storage type",
       s3ConfigRequired: "Please select an S3 configuration",
+      webdavConfigRequired: "Please select a WebDAV configuration",
       mountPathRequired: "Mount path is required",
       mountPathFormat: "Mount path must start with /",
       mountPathInvalid: "Mount path format is invalid, must be in /xxx format, only letters, numbers, underscores, hyphens, Chinese characters and slashes are allowed",

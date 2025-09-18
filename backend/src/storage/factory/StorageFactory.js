@@ -5,6 +5,7 @@
  */
 
 import { S3StorageDriver } from "../drivers/s3/S3StorageDriver.js";
+import { WebDAVStorageDriver } from "../drivers/webdav/WebDAVStorageDriver.js";
 
 export class StorageFactory {
   /**
@@ -12,8 +13,8 @@ export class StorageFactory {
    */
   static SUPPORTED_TYPES = {
     S3: "S3",
+    WEBDAV: "WebDAV",
     // 未来扩展：
-    // WEBDAV: "WebDAV",
     // LOCAL: "Local"
   };
 
@@ -39,11 +40,12 @@ export class StorageFactory {
         await s3Driver.initialize();
         return s3Driver;
 
+      case StorageFactory.SUPPORTED_TYPES.WEBDAV:
+        const webdavDriver = new WebDAVStorageDriver(config, encryptionSecret);
+        await webdavDriver.initialize();
+        return webdavDriver;
+
       // 未来扩展：
-      // case StorageFactory.SUPPORTED_TYPES.WEBDAV:
-      //   const webdavDriver = new WebDAVStorageDriver(config, encryptionSecret);
-      //   await webdavDriver.initialize();
-      //   return webdavDriver;
 
       // case StorageFactory.SUPPORTED_TYPES.LOCAL:
       //   const localDriver = new LocalStorageDriver(config, encryptionSecret);
@@ -80,8 +82,8 @@ export class StorageFactory {
   static getTypeDisplayName(storageType) {
     const displayNames = {
       [StorageFactory.SUPPORTED_TYPES.S3]: "S3 兼容存储",
+      [StorageFactory.SUPPORTED_TYPES.WEBDAV]: "WebDAV 存储",
       // 未来扩展：
-      // [StorageFactory.SUPPORTED_TYPES.WEBDAV]: "WebDAV 存储",
       // [StorageFactory.SUPPORTED_TYPES.LOCAL]: "本地存储"
     };
 
@@ -105,6 +107,9 @@ export class StorageFactory {
     switch (storageType) {
       case StorageFactory.SUPPORTED_TYPES.S3:
         return StorageFactory._validateS3Config(config);
+
+      case StorageFactory.SUPPORTED_TYPES.WEBDAV:
+        return StorageFactory._validateWebDAVConfig(config);
 
       // 未来扩展其他存储类型的验证
 
@@ -142,6 +147,45 @@ export class StorageFactory {
     // 验证bucket名称格式
     if (config.bucket_name && !/^[a-z0-9.-]+$/.test(config.bucket_name)) {
       errors.push("bucket_name 格式无效，只能包含小写字母、数字、点和连字符");
+    }
+
+    return {
+      valid: errors.length === 0,
+      errors,
+    };
+  }
+
+  /**
+   * 验证WebDAV配置
+   * @private
+   * @param {Object} config - WebDAV配置
+   * @returns {Object} 验证结果
+   */
+  static _validateWebDAVConfig(config) {
+    const errors = [];
+    const requiredFields = ["id", "name", "url"];
+
+    for (const field of requiredFields) {
+      if (!config[field]) {
+        errors.push(`WebDAV配置缺少必填字段: ${field}`);
+      }
+    }
+
+    // 验证URL格式
+    if (config.url) {
+      try {
+        const url = new URL(config.url);
+        if (!['http:', 'https:'].includes(url.protocol)) {
+          errors.push("WebDAV URL必须使用HTTP或HTTPS协议");
+        }
+      } catch (error) {
+        errors.push("WebDAV URL格式无效");
+      }
+    }
+
+    // 验证用户名和密码（可选，但如果提供了用户名，通常也需要密码）
+    if (config.username && !config.password) {
+      errors.push("提供了用户名但缺少密码");
     }
 
     return {
